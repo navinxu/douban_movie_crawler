@@ -1,0 +1,8 @@
+*.log
+*.txt
+*proxy*
+douban-env/
+*.db
+__pycache__/
+*.swp
+*.pyc
