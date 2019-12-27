@@ -15,28 +15,66 @@ print(time.ctime() + ': 爬虫已经开始工作')
 begin_date = time.ctime()
 print(time.ctime() + ': 开始时间是：{}'.format(begin_date))
 
+"""
+保存上次爬取到的位置
+（start 的值）
+"""
+filename = 'last_start.txt'
+try:
+    f_r = open(filename, 'r')
+except FileNotFoundError as ex:
+    try:
+        f_w = open(filename, 'w')
+        f_w.close()
+        f_r = open(filename, 'r')
+    except IOError as e:
+        quit(e.message)
+
 start = 0
+content = f_r.readline()
+if not (content == ""):
+    start = int(content)
+f_r.close()
+
 try_counts = 0
+try_counts4 = 0
+try_counts5 = 0
 
 db_pipeline = DoubanMoviePipeline()
 while True:
     '''
     电影分页循环
     '''
+
+    """
+    实时改变文件中的 start 值
+    """
+    try:
+        f_w = open(filename, 'w')
+    except IOError as e:
+        quit(e.message)
+    f_w.write(str(start))
+
     print('进入第 {} 页'.format(int(start / 20 + 1)))
     url = 'https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=&start={}'.format(start)
-    if try_counts == 5:
-        print("可能被Ban了！")
+    if try_counts == 10 or try_counts4 == 10 or try_counts5 == 10:
+        print("可能被Ban了！位置：Outer")
+        f_w.close()
         break
+
     request = Request()
     r = request.get_html_text(url)
     if r:
         if re.match(r'\{"data":\[\{"directors":\[', r):
             html_json = json.loads(r)
         else:
+            try_counts += 1
             continue
 
         if request.status_code == 200:
+
+            try_counts4 = 0
+            try_counts5 = 0
 
             pages = Pages(html_json)
 
@@ -50,14 +88,22 @@ while True:
                                    db_pipeline.crawl_count,
                                    db_pipeline.insert_count))
                 print(time.ctime() + ': 结束时间是：{}'.format(end_date))
+                f_w.close()
                 quit()
             movie_items = pages.get_movie_pages()
             movie_item = movie_items.pop()
 
+            try_counts2 = 0
+            try_counts3 = 0
             while True:
                 """
                 电影主页循环
                 """
+
+                if try_counts2 == 10 or try_counts3 == 10:
+                    f_w.write(str(start))
+                    f_w.close()
+                    quit()
 
                 movie_id = movie_item.rstrip('/').split('/').pop()
 
@@ -99,16 +145,19 @@ while True:
                     info.get_movie_info(item)
                     db_pipeline.process_item(item)
                     time.sleep(0.5)
+                    try_counts2 = 0
+                    try_counts3 = 0
 
                 elif request.status_code == 403:
-                    print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP')
-                    movie_items.append(movie_item)
+                    print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Inner While')
+                    #  movie_items.append(movie_item)
+                    try_counts3 += 1
                 else:
-                    print('{} : HTTP CODE : {}未知错误，可能是错误的URL，' +
-                          '也可能IP被封禁了！'.format(
+                    print('{} : HTTP CODE : {}未知错误，可能是错误的URL，也可能IP被封禁了！退出位置：Inner While'.format(
                                                       time.ctime(),
                                                       request.status_code))
-                    movie_items.append(movie_item)
+                    #  movie_items.append(movie_item)
+                    try_counts2 += 1
 
                 try:
                     movie_item = movie_items.pop()
@@ -118,12 +167,15 @@ while True:
 
             start += 20
 
+            # 关闭文件
+            f_w.close()
+
         elif request.status_code == 403:
-            print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP')
-            quit()
+            print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Outer While')
+            try_counts4 += 1
         else:
-            quit('{} : HTTP CODE : {}未知错误，可能是错误的URL，' +
-                 '也可能IP被封禁了！'.format(time.ctime(), request.status_code))
+            print('{} : HTTP CODE : {}未知错误，可能是错误的URL，也可能IP被封禁了！退出位置：Outer While'.format(time.ctime(), request.status_code))
+            try_counts5 += 1
     else:
         try_counts += 1
         continue

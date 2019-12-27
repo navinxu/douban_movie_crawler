@@ -28,7 +28,7 @@ class Request(object):
                 delay = 0
                 if bool(settings.DOWNLOAD_RANDOM):
                     # 保证不小于1,且小于3
-                    delay = random.randint(1, 5) * int(settings.DOWNLOAD_DELAY) * 0.25
+                    delay = random.randint(1, 6) * int(settings.DOWNLOAD_DELAY) * 0.25
                     time.sleep(delay)
                 else:
                     delay = int(settings.DOWNLOAD_DELAY)
@@ -63,12 +63,12 @@ class Request(object):
                 return self.r
             except Exception:
                 # print(e)
-                try_count += 1
-                print('{} : 页面 {} 进行第 {} 次尝试'.format(time.ctime(), url, try_count))
-                if try_count > 7:
+                if try_count == 10:
                     print('{}: 超时！'.format(time.ctime()))
                     return False
                     break
+                try_count += 1
+                print('{} : 页面 {} 进行第 {} 次尝试'.format(time.ctime(), url, try_count))
 
     def get_html_text(self, url):
         r = self.send_request(url)
