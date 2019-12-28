@@ -60,6 +60,7 @@ class Request(object):
                 self.r.encoding = 'utf-8'
                 self.status_code = self.r.status_code
                 # print(self.status_code)
+                try_count = 0
                 return self.r
             except Exception:
                 # print(e)
