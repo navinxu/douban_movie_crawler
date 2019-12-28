@@ -220,19 +220,23 @@ class Info(object):
             ## 评分 
             interest_sectl = self.html.xpath('//div[@id="interest_sectl"]')
 
-            rating = interest_sectl[0].xpath('//strong[@class="ll rating_num"]/text()')
+            rating = interest_sectl[0].xpath('//strong[@class="ll rating_num"]/text()')[0]
         except IndexError as e:
             # 评分人数不足（< 10）
-            rating = ['0.0']
+            rating = '0.0'
 
-        return self.format_item(rating[0].strip())
-    
+        return self.format_item(rating)
+
     def format_item(self, items):
 
-        if type(items) == type("a"):
+        if isinstance(items, str):
             items = items.strip()
+            if items == "":
+                items = "None"
             return items
-        elif type(items) == type(list()):
+        elif isinstance(items, list):
             for item in items:
                 items[items.index(item)] = item.strip()
-                return '/'.join(items)
+            return '/'.join(items)
+        elif items is None:
+            return "None"
