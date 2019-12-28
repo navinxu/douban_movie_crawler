@@ -55,11 +55,14 @@ while True:
         quit(e.message)
     f_w.write(str(start))
 
+    # 关闭文件
+    if f_w:
+        f_w.close()
+
     print('进入第 {} 页'.format(int(start / 20 + 1)))
     url = 'https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=&start={}'.format(start)
     if try_counts == 10 or try_counts4 == 10 or try_counts5 == 10:
         print("可能被Ban了！位置：Outer")
-        f_w.close()
         break
 
     request = Request()
@@ -88,7 +91,6 @@ while True:
                                    db_pipeline.crawl_count,
                                    db_pipeline.insert_count))
                 print(time.ctime() + ': 结束时间是：{}'.format(end_date))
-                f_w.close()
                 quit()
             movie_items = pages.get_movie_pages()
             movie_item = movie_items.pop()
@@ -101,8 +103,6 @@ while True:
                 """
 
                 if try_counts2 == 10 or try_counts3 == 10:
-                    f_w.write(str(start))
-                    f_w.close()
                     quit()
 
                 movie_id = movie_item.rstrip('/').split('/').pop()
@@ -168,9 +168,6 @@ while True:
                     break
 
             start += 20
-
-            # 关闭文件
-            f_w.close()
 
         elif request.status_code == 403:
             print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Outer While')
