@@ -152,12 +152,14 @@ while True:
                     print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Inner While')
                     #  movie_items.append(movie_item)
                     try_counts3 += 1
+                    continue
                 else:
                     print('{} : HTTP CODE : {}未知错误，可能是错误的URL，也可能IP被封禁了！退出位置：Inner While'.format(
                                                       time.ctime(),
                                                       request.status_code))
                     #  movie_items.append(movie_item)
                     try_counts2 += 1
+                    continue
 
                 try:
                     movie_item = movie_items.pop()
