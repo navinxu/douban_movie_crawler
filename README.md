@@ -18,3 +18,6 @@ SQLite3
 python3 crawler.py
 ```
 运行的前提条件是要有一个名字为 `movies.db` 的 SQLite3 数据库，且有个叫 `douban_movie_info` 的数据表，表的定义请看项目的 `sqlite3_table_create.sql` 文件。
+
+## 限制
+本爬虫使用的是 https://movie.douban.com/j/new_search_subjects?sort=T&range=0,10&tags=&start=9980 接口，其中 start 参数从 0 开始，它的变化影响着翻页，其具体实现和翻页的规则都在文件 `crawler.py` 中。start 参数到了 9980 就返回空 JSON 串，刚好是第 500 页，也就是不能再获得数据。
