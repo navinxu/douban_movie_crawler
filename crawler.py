@@ -72,6 +72,7 @@ while True:
             html_json = json.loads(r)
         else:
             try_counts += 1
+            print(r)
             continue
 
         if request.status_code == 200:
@@ -149,16 +150,19 @@ while True:
                     try_counts3 = 0
 
                 elif request.status_code == 403:
-                    print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Inner While')
+                    print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Inner While。已重试 {} 遍'.format(try_counts3))
                     #  movie_items.append(movie_item)
                     try_counts3 += 1
+                    print(r)
                     continue
                 else:
-                    print('{} : HTTP CODE : {}未知错误，可能是错误的URL，也可能IP被封禁了！退出位置：Inner While'.format(
+                    print('{} : HTTP CODE : {}未知错误，可能是错误的URL，也可能IP被封禁了！退出位置：Inner While。已重试 {} 遍'.format(
                                                       time.ctime(),
-                                                      request.status_code))
+                                                      request.status_code,
+                                                      try_counts2))
                     #  movie_items.append(movie_item)
                     try_counts2 += 1
+                    print(r)
                     continue
 
                 try:
@@ -170,10 +174,12 @@ while True:
             start += 20
 
         elif request.status_code == 403:
-            print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Outer While')
+            print(time.ctime() + ' : 爬虫所在 IP 已经被网站列入黑名单，需要更换 IP。退出位置：Outer While。已重试 {} 遍'.format(try_count4))
+            print(r)
             try_counts4 += 1
         else:
-            print('{} : HTTP CODE : {}未知错误，可能是错误的URL，也可能IP被封禁了！退出位置：Outer While'.format(time.ctime(), request.status_code))
+            print('{} : HTTP CODE : {}未知错误，可能是错误的URL，也可能IP被封禁了！退出位置：Outer While。已重试 {} 遍'.format(time.ctime(), request.status_codem, try_count5))
+            print(r)
             try_counts5 += 1
     else:
         try_counts += 1

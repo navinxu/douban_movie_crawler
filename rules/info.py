@@ -95,7 +95,7 @@ class Info(object):
         又名
         """
         alternate_name = self.get_elem_region('又名')
-        return alternate_name
+        return self.format_item(alternate_name)
 
     def get_running_time(self):
         """
@@ -103,7 +103,7 @@ class Info(object):
         结构同 类型
         """
         running_time = self.get_elem_type('片长')
-        return running_time
+        return self.format_item(running_time)
 
 
     def get_release_date(self):
@@ -112,7 +112,7 @@ class Info(object):
         结构同 类型
         """
         release_date = self.get_elem_type('上映日期')
-        return release_date
+        return self.format_item(release_date)
 
 
     def get_language(self):
@@ -121,7 +121,7 @@ class Info(object):
         结构同 类型
         """
         language = self.get_elem_region('语言')
-        return language
+        return self.format_item(language)
 
     def get_elem_region(self, elem):
         try:
@@ -144,7 +144,7 @@ class Info(object):
         类型:</span> <span...>...</span> / <span...>...</span>...<br/>
         """
         movie_type = self.get_elem_type('类型')
-        return movie_type
+        return self.format_item(movie_type)
 
     def get_elem_director(self, elem):
         """
@@ -164,7 +164,7 @@ class Info(object):
         结构同 导演
         """
         starring = self.get_elem_director('主演')
-        return starring
+        return self.format_item(starring)
 
 
     def get_scriptwriter(self):
@@ -173,14 +173,14 @@ class Info(object):
         结构同 导演
         """
         scriptwriter = self.get_elem_director('编剧')
-        return scriptwriter
+        return self.format_item(scriptwriter)
 
     def get_director(self):
         """
         导演</span>: <span class='attrs'><a...>...</a> / <a...>...</a> / ...</span></span><br/>
         """
         director = self.get_elem_director('导演')
-        return director
+        return self.format_item(director)
 
 
     def get_cover(self):
@@ -232,11 +232,15 @@ class Info(object):
         if isinstance(items, str):
             items = items.strip()
             if items == "":
-                items = "None"
-            return items
+                items == "None"
+            itemss = items.split('/')
+            for item in itemss:
+                itemss[itemss.index(item)] = item.strip()
+            items = '/'.join(itemss)
+            return str(items)
         elif isinstance(items, list):
             for item in items:
                 items[items.index(item)] = item.strip()
-            return '/'.join(items)
+            return str('/'.join(items))
         elif items is None:
             return "None"
