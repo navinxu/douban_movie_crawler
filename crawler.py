@@ -143,7 +143,8 @@ while True:
                 info = Info(etree.HTML(r), movie_item)
                 if request.status_code == 200:
                     item = MovieItems()
-                    info.get_movie_info(item)
+                    if not info.get_movie_info(item):
+                        continue
                     db_pipeline.process_item(item)
                     time.sleep(0.5)
                     try_counts2 = 0
